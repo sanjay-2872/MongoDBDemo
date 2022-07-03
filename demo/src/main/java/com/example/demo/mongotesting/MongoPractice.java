@@ -31,6 +31,7 @@ public class MongoPractice {
 
 				String data1= "{\"$match\":{'awards.wins':{'$gt':1}}}";
 				// Build pipeline as a Bson
+				
 				String pipe = match + ", " + sort;
 				String strcCmd = "{ 'aggregate': '" + collectionName + "', 'pipeline': [" + data1 + "], 'cursor': { } }";
 				Document bsonCmd = Document.parse(strcCmd);
