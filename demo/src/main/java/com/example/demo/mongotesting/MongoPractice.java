@@ -14,7 +14,7 @@ public class MongoPractice {
 	
 	public static void main(String[] args) {
 		// Replace the uri string with your MongoDB deployment's connection string
-		String[] completeUri = "mongodb://localhost:27017//learning//learning2".split("//");
+		String[] completeUri = "mongodb://localhost:27017//learning//Movie".split("//");
 		String uri = completeUri[0] + "//" + completeUri[1];
 		String databaseName = completeUri[2];
 		String collectionName = completeUri[3];
@@ -29,9 +29,11 @@ public class MongoPractice {
 				
 				String Data = "{\"$group\":{\"_id\":{\"exp\":'$exp','gender':'$gender'},count:{'$count':{}},'sum':{\"$sum\":\"$exp\"}}},{'$project':{\"Exp\":\"$_id.exp\",\"Gender\":\"$_id.gender\",\"_id\":0,\"count\":\"$count\",\"SumOfExp\":\"$sum\"}},{'$sort':{'Exp':-1}}";
 
+				String data1= "{\"$match\":{'awards.wins':{'$gt':1}}}";
 				// Build pipeline as a Bson
+				
 				String pipe = match + ", " + sort;
-				String strcCmd = "{ 'aggregate': '" + collectionName + "', 'pipeline': [" + Data + "], 'cursor': { } }";
+				String strcCmd = "{ 'aggregate': '" + collectionName + "', 'pipeline': [" + data1 + "], 'cursor': { } }";
 				Document bsonCmd = Document.parse(strcCmd);
 
 				// Execute the native query
