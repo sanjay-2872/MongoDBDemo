@@ -29,7 +29,7 @@ public class MongoPractice {
 				
 				String Data = "{\"$group\":{\"_id\":{\"exp\":'$exp','gender':'$gender'},count:{'$count':{}},'sum':{\"$sum\":\"$exp\"}}},{'$project':{\"Exp\":\"$_id.exp\",\"Gender\":\"$_id.gender\",\"_id\":0,\"count\":\"$count\",\"SumOfExp\":\"$sum\"}},{'$sort':{'Exp':-1}}";
 
-				String data1= "{\"$match\":{'awards.wins':{'$gt':1}}}";
+				String data1= "{\"$match\":{'awards.wins':{'$gt':1}}},{'$limit':1}";
 				// Build pipeline as a Bson
 				
 				String pipe = match + ", " + sort;
