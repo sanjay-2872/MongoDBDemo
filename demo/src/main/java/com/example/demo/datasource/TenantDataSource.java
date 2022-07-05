@@ -1,6 +1,7 @@
 package com.example.demo.datasource;
 
 import java.io.Serializable;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -14,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,17 +34,17 @@ public class TenantDataSource implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Map<String, DataSource> dataSources = new HashMap<>();
+	private Map<String, Object> dataSources = new HashMap<>();
 
 	private Map<String, DataSourceDto> dataSourceList = new HashMap<>();
 
-	public DataSource getDataSource(String name) {
+	public Object getDataSource(String name) {
 
 		if (dataSources.get(name) != null) {
 			return dataSources.get(name);
 		}
 
-		DataSource dataSource = createDataSource(name);
+		Object dataSource = createDataSource(name);
 
 		if (dataSource != null) {
 			dataSources.put(name, dataSource);
@@ -51,12 +55,23 @@ public class TenantDataSource implements Serializable {
 
 	public JdbcTemplate getJDBCTemplate(String name) {
 
-		return new JdbcTemplate(this.getDataSource(name));
+		return new JdbcTemplate((DataSource) this.getDataSource(name));
+	}
+	
+	public String getDatabaseType(String name) {
+		return dataSourceList.get(name).getDatabaseType();
+	}
+
+	public MongoClient getMongoClientConnection(String name) {
+		
+		MongoClient mongoClient =  (MongoClient) this.getDataSource(name);
+		return mongoClient;
+		
 	}
 	
 	public Connection getConnection(String name) throws SQLException {
 
-		return this.getDataSource(name).getConnection();
+		return ((DataSource) this.getDataSource(name)).getConnection();
 	}
 
 	@PostConstruct
@@ -82,15 +97,19 @@ public class TenantDataSource implements Serializable {
 		}
 	}
 
-	private DataSource createDataSource(String name) {
+	private Object createDataSource(String name) {
 		DataSourceDto config = dataSourceList.get(name);
 		if (config != null) {
-			return DataSourceBuilder.create().driverClassName(config.getDriverClassName())
-					.username(config.getUsername()).password(config.getPassword()).url(config.getUrl()).build();
+			if ("MONGODB".equals(config.getDatabaseType())) {
+				log.info("{} : Mongo Client created.",name);
+				return MongoClients.create(config.getUrl());
+			} else {
+				log.info("{} : Relational data source created.",name);
+				return DataSourceBuilder.create().driverClassName(config.getDriverClassName())
+						.username(config.getUsername()).password(config.getPassword()).url(config.getUrl()).build();
+			}
 		}
 		return null;
 	}
-	
-	
 
 }

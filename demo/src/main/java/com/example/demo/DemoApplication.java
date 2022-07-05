@@ -14,7 +14,7 @@ public class DemoApplication {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext ac =	SpringApplication.run(DemoApplication.class, args);
 		
-		mgClient = ac.getBean(Learning1.class).getDataSource();
+		//mgClient = ac.getBean(Learning1.class).getDataSource();
 	}
 
 }
