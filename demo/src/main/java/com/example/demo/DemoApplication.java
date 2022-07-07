@@ -10,7 +10,7 @@ import com.mongodb.client.MongoClient;
 @SpringBootApplication
 public class DemoApplication {
 
-	public static MongoClient mgClient;
+	//public static MongoClient mgClient;
 	public static void main(String[] args) {
 		ConfigurableApplicationContext ac =	SpringApplication.run(DemoApplication.class, args);
 		
